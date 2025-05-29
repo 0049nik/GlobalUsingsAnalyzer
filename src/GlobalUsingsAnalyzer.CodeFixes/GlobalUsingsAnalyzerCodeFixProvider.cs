@@ -15,6 +15,7 @@ namespace GlobalUsingsAnalyzer
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(GlobalUsingsAnalyzerCodeFixProvider)), Shared]
     public class GlobalUsingsAnalyzerCodeFixProvider : CodeFixProvider
     {
+        private const string GlobalPrefix = "global ";
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
             get => ImmutableArray.Create(GlobalUsingsAnalyzer.DiagnosticId);
@@ -63,7 +64,12 @@ namespace GlobalUsingsAnalyzer
                         {
                             using (var writer = globalUsings.AppendText())
                             {
-                                await writer.WriteLineAsync($"global {text}").ConfigureAwait(false);
+                                if(!text.StartsWith(GlobalPrefix))
+                                {
+                                    text = GlobalPrefix + text;
+                                }
+                                
+                                await writer.WriteLineAsync(text).ConfigureAwait(false);
                             }
                         }
                     }
